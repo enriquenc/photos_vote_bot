@@ -8,7 +8,7 @@ bot = telebot.TeleBot(f.readline())
 
 f.close()
 
-sheet = Sheet()
+sheet = Sheet("photos_vote_bot")
 
 @bot.message_handler(func=lambda message: message.chat.id == message.from_user.id,commands=['start'])
 def send_start(message):
