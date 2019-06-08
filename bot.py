@@ -23,9 +23,6 @@ def send_start(message):
         bot.send_message(message.chat.id, "Вибери свого фаворита вище")
 
 
-#@bot.message_handler(commands=['vote'])
-
-
 def create_vote_markup(message, place):
     user_id = str(message.from_user.id)
 

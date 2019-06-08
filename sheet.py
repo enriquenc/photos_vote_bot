@@ -1,7 +1,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from database_interface import *
-from pprint import pprint
 
 
 class Sheet:
@@ -37,13 +36,3 @@ class Sheet:
     def get_participants(self):
         return self.sheet.col_values(2)[1:]
 
-#s = Sheet()
-#print(s.get_participants())
-
-#i = 0
-
-#sheet.update_cell(2,2, i + 1)
-#i = sheet.cell(2,2).value
-#sheet.update_cell(2,2, int(i) + 2)
-
-#pprint(data[1]['ФИО'])
