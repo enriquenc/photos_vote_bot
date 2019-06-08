@@ -13,7 +13,14 @@ places = {
 def check_vote(id, place):
     cursor.execute("SELECT " + places[place] + " FROM votes WHERE id = " + id)
     result = cursor.fetchall()
+    if result is ():
+        return None
     return result[0][0]
+
+
+def new_user(id):
+    cursor.execute("INSERT into votes (id) values (" + id + ")")
+    conn.commit()
 
 
 def vote(id, place, participants_number):
@@ -21,7 +28,6 @@ def vote(id, place, participants_number):
     conn.commit()
 
 
-#print(check_vote('421421421', 1))
-#vote('421421421', 1, 7)
-#conn.commit()
-#print(cursor.fetchall())
+if __name__ == '__main__':
+    cursor.execute("SELECT * from votes")
+    print(cursor.fetchall())

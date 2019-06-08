@@ -1,5 +1,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from database_interface import *
 from pprint import pprint
 
 
@@ -15,13 +16,14 @@ class Sheet:
         self.client = gspread.authorize(self.creds)
         self.sheet = self.client.open(name).sheet1
 
-    def vote(self, number, place):
-        votes_number = self.sheet.cell(number + 1, place + 2).value
-        self.sheet.update_cell(number + 1, place + 2, int(votes_number) + 1)
+    def vote(self, user_id, place, number):
+        votes_number = int(self.sheet.cell(number + 1, place + 2).value)
+        self.sheet.update_cell(number + 1, place + 2, votes_number + 1)
+        vote(user_id, place, number)
 
-    def unvote(self, number, place):
-        votes_number = self.sheet.cell(number + 1, place + 2).value
-        self.sheet.update_cell(number + 1, place + 2, int(votes_number) - 1)
+    def unvote(self, place, number):
+        votes_number = int(self.sheet.cell(number + 1, place + 2).value)
+        self.sheet.update_cell(number + 1, place + 2, votes_number - 1)
 
     def null(self):
         data = self.sheet.get_all_values()
