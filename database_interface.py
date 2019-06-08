@@ -1,6 +1,12 @@
 import pymysql
 
-conn = pymysql.connect(host='127.0.0.1', user='root', passwd='root', db='photos_vote_bot')
+f = open('database_authorization', 'r')
+database_info = f.read().splitlines()
+f.close()
+conn = pymysql.connect(host=database_info[0],
+                       user=database_info[1],
+                       passwd=database_info[2],
+                       db=database_info[3])
 cursor = conn.cursor()
 
 places = {
