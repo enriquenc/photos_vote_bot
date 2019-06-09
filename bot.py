@@ -54,7 +54,6 @@ def callback_inline(call):
                               text= "<b>" + data[1] +" місце: </b>" + data[-1],
                               reply_markup=markup,
                               parse_mode='html')
-        print(data)
         sheet.vote(data[0], int(data[1]), int(data[2]))
 
 
