@@ -30,10 +30,13 @@ def new_user(id):
 
 
 def vote(id, place, participants_number):
+
     cursor.execute("update votes SET " + places[place] + " = " + str(participants_number) + " WHERE id = " + id)
     conn.commit()
 
 
 if __name__ == '__main__':
     cursor.execute("SELECT * from votes")
+    #cursor.execute("delete from votes")
+    #conn.commit()
     print(cursor.fetchall())

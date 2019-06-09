@@ -26,7 +26,7 @@ class Sheet:
 
     def null(self):
         data = self.sheet.get_all_values()
-        for row in range(2, len(data) +1):
+        for row in range(2, len(data) + 1):
             self.sheet.update_cell(row, 3, 0)
             self.sheet.update_cell(row, 4, 0)
             self.sheet.update_cell(row, 5, 0)

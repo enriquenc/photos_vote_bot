@@ -2,6 +2,7 @@ import telebot
 from sheet import Sheet
 from telebot import types
 from database_interface import new_user, check_vote
+import pprint
 
 f = open("token", 'r')
 
@@ -24,7 +25,7 @@ def send_start(message):
 
 
 def create_vote_markup(message, place):
-    user_id = str(message.from_user.id)
+    user_id = str(message.chat.id)
 
     participants = sheet.get_participants()
     markup = types.InlineKeyboardMarkup(row_width=1)
@@ -53,6 +54,7 @@ def callback_inline(call):
                               text= "<b>" + data[1] +" місце: </b>" + data[-1],
                               reply_markup=markup,
                               parse_mode='html')
+        print(data)
         sheet.vote(data[0], int(data[1]), int(data[2]))
 
 
