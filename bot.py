@@ -24,9 +24,7 @@ def send_start(message):
         bot.send_message(message.chat.id, "Вибери свого фаворита вище")
 
 
-def create_vote_markup(message, place):
-    user_id = str(message.chat.id)
-
+def create_vote_markup(user_id, place):
     participants = sheet.get_participants()
     markup = types.InlineKeyboardMarkup(row_width=1)
     for i in range(len(participants)):
@@ -44,7 +42,7 @@ def callback_inline(call):
         bot.edit_message_text(chat_id=call.message.chat.id,
                               message_id=call.message.message_id,
                               text="Проголосуйте за " + data[1] + ' місце',
-                              reply_markup=create_vote_markup(call.message, data[1]))
+                              reply_markup=create_vote_markup(call.message.chat.id, data[1]))
         sheet.unvote(int(data[1]), int(data[2]))
     else:
         markup = types.InlineKeyboardMarkup(row_width=1)
