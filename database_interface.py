@@ -27,18 +27,36 @@ def check_vote(id, place):
 
 
 def new_user(id):
+    global cursor
+    global conn
+
     try:
         cursor.execute("INSERT into votes (id) values (" + id + ")")
         conn.commit()
     except Exception as msg:
+        conn = pymysql.connect(host=database_info[0],
+                               user=database_info[1],
+                               passwd=database_info[2],
+                               db=database_info[3])
+        cursor = conn.cursor()
+        cursor.execute("delete from votes where id = " + id)
         print("new_user: " + id + ", error: " + str(msg))
+        return False
+    return True
 
 
 def vote(id, place, participants_number):
+    global cursor
+    global conn
     try:
         cursor.execute("update votes SET " + places[place] + " = " + str(participants_number) + " WHERE id = " + id)
         conn.commit()
     except Exception as msg:
+        conn = pymysql.connect(host=database_info[0],
+                               user=database_info[1],
+                               passwd=database_info[2],
+                               db=database_info[3])
+        cursor = conn.cursor()
         print(strftime("[%a, %d %b %Y %H:%M:%S]", gmtime(2)) + str(participants_number) + " participant number is " + str(place) + ' place error: ' + str(msg))
 
 def count_votes(sheet):

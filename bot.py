@@ -20,7 +20,9 @@ f.close()
 def send_start(message):
     user_id = str(message.chat.id)
     if database_interface.check_vote(user_id, 1) is None:
-        database_interface.new_user(user_id)
+        if database_interface.new_user(user_id) is False:
+            bot.send_message(message.chat.id, "Сталась помилка, спробуй ще раз - /start")
+            return
         bot.send_message(message.chat.id, "Привіт, голосуй")
         bot.send_message(message.chat.id, "Проголосуйте за 1 місце:", reply_markup=create_vote_markup(user_id, '1'))
         bot.send_message(message.chat.id, "Проголосуйте за 2 місце:", reply_markup=create_vote_markup(user_id, '2'))
