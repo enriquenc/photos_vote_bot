@@ -1,6 +1,7 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from database_interface import *
+from time import gmtime, strftime
 
 
 class Sheet:
@@ -15,10 +16,12 @@ class Sheet:
         self.client = gspread.authorize(self.creds)
         self.sheet = self.client.open(name).sheet1
 
-    def vote(self, user_id, place, number):
+    def vote(self, place, number):
+        if number == 0:
+            return 
         votes_number = int(self.sheet.cell(number + 1, place + 2).value)
         self.sheet.update_cell(number + 1, place + 2, votes_number + 1)
-        vote(user_id, place, number)
+        #vote(user_id, place, number)
 
     def unvote(self, place, number):
         votes_number = int(self.sheet.cell(number + 1, place + 2).value)
@@ -26,7 +29,7 @@ class Sheet:
 
     def null(self):
         data = self.sheet.get_all_values()
-        for row in range(2, len(data) + 1):
+        for row in range(2, len(data)):
             self.sheet.update_cell(row, 3, 0)
             self.sheet.update_cell(row, 4, 0)
             self.sheet.update_cell(row, 5, 0)
