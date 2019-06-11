@@ -14,7 +14,7 @@ bot = telebot.TeleBot(f.readline())
 
 f.close()
 
-sheet = Sheet("photos_vote_bot")
+
 
 @bot.message_handler(func=lambda message: message.chat.id == message.from_user.id,commands=['start'])
 def send_start(message):
@@ -30,6 +30,7 @@ def send_start(message):
 
 
 def create_vote_markup(user_id, place):
+    sheet = Sheet("photos_vote_bot")
     participants = sheet.get_participants()
     markup = types.InlineKeyboardMarkup(row_width=1)
     for i in range(len(participants)):
@@ -67,6 +68,7 @@ def callback_inline(call):
 
 @bot.message_handler(commands=['result'])
 def result(message):
+    sheet = Sheet("photos_vote_bot")
     f = open('admin')
     admins = f.read().splitlines()
     f.close()
