@@ -42,6 +42,9 @@ def vote(id, place, participants_number):
         print(strftime("[%a, %d %b %Y %H:%M:%S]", gmtime(2)) + str(participants_number) + " participant number is " + str(place) + ' place error: ' + str(msg))
 
 def count_votes(sheet):
+    global conn
+    global cursor
+
     try:
         sheet.null()
         #p_count = len(sheet.get_participants())
@@ -55,6 +58,12 @@ def count_votes(sheet):
             sheet.vote(2, second_place)
             sheet.vote(3, third_place)
     except Exception as msg:
+        conn = pymysql.connect(host=database_info[0],
+                               user=database_info[1],
+                               passwd=database_info[2],
+                               db=database_info[3])
+        cursor = conn.cursor()
+
         f = open('errors', 'a+')
         f.write(strftime("[%a, %d %b %Y %H:%M:%S]", gmtime(2)) + ': count_votes: ' + str(msg) + '\n')
         f.close()

@@ -90,6 +90,6 @@ while True:
     # TypeError for moviepy errors
     # maybe there are others, therefore Exception
     except Exception as e:
-        f = open('errors', 'w')
+        f = open('errors', 'a+')
         f.write(strftime("[%a, %d %b %Y %H:%M:%S]", gmtime(2)) + ' Error: ' + str(e) + '\n')
         f.close()
