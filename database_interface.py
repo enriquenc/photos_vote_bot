@@ -5,11 +5,6 @@ import pprint
 f = open('database_authorization', 'r')
 database_info = f.read().splitlines()
 f.close()
-conn = pymysql.connect(host=database_info[0],
-                       user=database_info[1],
-                       passwd=database_info[2],
-                       db=database_info[3])
-cursor = conn.cursor()
 
 places = {
     1: 'first_place',
@@ -19,6 +14,12 @@ places = {
 
 
 def check_vote(id, place):
+    conn = pymysql.connect(host=database_info[0],
+                           user=database_info[1],
+                           passwd=database_info[2],
+                           db=database_info[3])
+    cursor = conn.cursor()
+
     cursor.execute("SELECT " + places[place] + " FROM votes WHERE id = " + id)
     result = cursor.fetchall()
     if result is ():
@@ -27,18 +28,16 @@ def check_vote(id, place):
 
 
 def new_user(id):
-    global cursor
-    global conn
+    conn = pymysql.connect(host=database_info[0],
+                           user=database_info[1],
+                           passwd=database_info[2],
+                           db=database_info[3])
+    cursor = conn.cursor()
 
     try:
         cursor.execute("INSERT into votes (id) values (" + id + ")")
         conn.commit()
     except Exception as msg:
-        conn = pymysql.connect(host=database_info[0],
-                               user=database_info[1],
-                               passwd=database_info[2],
-                               db=database_info[3])
-        cursor = conn.cursor()
         cursor.execute("delete from votes where id = " + id)
         print("new_user: " + id + ", error: " + str(msg))
         return False
@@ -46,22 +45,24 @@ def new_user(id):
 
 
 def vote(id, place, participants_number):
-    global cursor
-    global conn
+    conn = pymysql.connect(host=database_info[0],
+                           user=database_info[1],
+                           passwd=database_info[2],
+                           db=database_info[3])
+    cursor = conn.cursor()
+
     try:
         cursor.execute("update votes SET " + places[place] + " = " + str(participants_number) + " WHERE id = " + id)
         conn.commit()
     except Exception as msg:
-        conn = pymysql.connect(host=database_info[0],
-                               user=database_info[1],
-                               passwd=database_info[2],
-                               db=database_info[3])
-        cursor = conn.cursor()
         print(strftime("[%a, %d %b %Y %H:%M:%S]", gmtime(2)) + str(participants_number) + " participant number is " + str(place) + ' place error: ' + str(msg))
 
 def count_votes(sheet):
-    global conn
-    global cursor
+    conn = pymysql.connect(host=database_info[0],
+                           user=database_info[1],
+                           passwd=database_info[2],
+                           db=database_info[3])
+    cursor = conn.cursor()
 
     try:
         sheet.null()
@@ -76,21 +77,33 @@ def count_votes(sheet):
             sheet.vote(2, second_place)
             sheet.vote(3, third_place)
     except Exception as msg:
-        conn = pymysql.connect(host=database_info[0],
-                               user=database_info[1],
-                               passwd=database_info[2],
-                               db=database_info[3])
-        cursor = conn.cursor()
-
         f = open('errors', 'a+')
         f.write(strftime("[%a, %d %b %Y %H:%M:%S]", gmtime(2)) + ': count_votes: ' + str(msg) + '\n')
         f.close()
         return False
     return True
 
+def free():
+    conn = pymysql.connect(host=database_info[0],
+                           user=database_info[1],
+                           passwd=database_info[2],
+                           db=database_info[3])
+    cursor = conn.cursor()
+
+    cursor.execute("DELETE from votes")
+    conn.commit()
+
+
 
 
 if __name__ == '__main__':
+
+    conn = pymysql.connect(host=database_info[0],
+                           user=database_info[1],
+                           passwd=database_info[2],
+                           db=database_info[3])
+    cursor = conn.cursor()
+
     cursor.execute("SELECT * from votes")
     #cursor.execute("delete from votes")
     #conn.commit()

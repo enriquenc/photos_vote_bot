@@ -1,12 +1,8 @@
 import telebot
-from time import gmtime, strftime, sleep
+from time import gmtime, strftime
 from sheet import Sheet
 from telebot import types
 import database_interface
-import logging
-
-
-logging.basicConfig(filename='logging', level=logging.DEBUG)
 
 f = open("token", 'r')
 
@@ -14,10 +10,13 @@ bot = telebot.TeleBot(f.readline())
 
 f.close()
 
-
+participants = None
 
 @bot.message_handler(func=lambda message: message.chat.id == message.from_user.id,commands=['start'])
 def send_start(message):
+    if participants is None:
+        bot.send_message(message.chat.id, "Голосування не запущено, зверніться до організатора.")
+        return
     user_id = str(message.chat.id)
     if database_interface.check_vote(user_id, 1) is None:
         if database_interface.new_user(user_id) is False:
@@ -32,12 +31,15 @@ def send_start(message):
 
 
 def create_vote_markup(user_id, place):
-    sheet = Sheet("photos_vote_bot")
-    participants = sheet.get_participants()
+    global participants
+
     markup = types.InlineKeyboardMarkup(row_width=1)
     for i in range(len(participants)):
-        markup.add(types.InlineKeyboardButton(  text=participants[i],
-                                                callback_data=str(user_id) + ';' + place +';' + str(i + 1) + ';' + participants[i]))
+        markup.add(types.InlineKeyboardButton(text=participants[i],
+                                                callback_data=  str(user_id) + ';'
+                                                                + place + ';'
+                                                                + str(i + 1) + ';'
+                                                                + participants[i]))
     return markup
 
 
@@ -71,10 +73,10 @@ def callback_inline(call):
 @bot.message_handler(commands=['result'])
 def result(message):
     sheet = Sheet("photos_vote_bot")
-    f = open('admin')
-    admins = f.read().splitlines()
-    f.close()
-    if str(message.chat.id) in admins:
+
+    admins = get_admins()
+
+    if message.from_user.username in admins:
         if database_interface.count_votes(sheet) is True:
             bot.send_message(message.chat.id, "Таблиця результатів оновлена.")
         else:
@@ -83,15 +85,21 @@ def result(message):
         bot.send_message(message.chat.id, "Упс... Схоже тебе немає в списку адміністраторів, звернись до розробника.")
 
 
-while True:
-    try:
-        bot.infinity_polling(True)
-        bot.polling(none_stop=True)
+@bot.message_handler(commands=['begin'])
+def reboot(message):
+    admins = get_admins()
 
-    # ConnectionError and ReadTimeout because of possible timout of the requests library
-    # TypeError for moviepy errors
-    # maybe there are others, therefore Exception
-    except Exception as e:
-        f = open('errors', 'a+')
-        f.write(strftime("[%a, %d %b %Y %H:%M:%S]", gmtime(2)) + ' Error: ' + str(e) + '\n')
-        f.close()
+    if message.from_user.username in admins:
+        database_interface.free()
+        global participants
+        sheet = Sheet("photos_vote_bot")
+        participants = sheet.get_participants()
+        bot.send_message(message.chat.id, "Голосування запущено.")
+
+
+def get_admins():
+    return open('admin').read().splitlines()
+
+
+if __name__ == "__main__":
+    bot.polling()
