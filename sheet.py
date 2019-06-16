@@ -16,11 +16,10 @@ class Sheet:
         self.client = gspread.authorize(self.creds)
         self.sheet = self.client.open(name).sheet1
 
-    def vote(self, place, number):
+    def vote(self, number, place, votes_number):
         if number == 0:
-            return 
-        votes_number = int(self.sheet.cell(number + 1, place + 2).value)
-        self.sheet.update_cell(number + 1, place + 2, votes_number + 1)
+            return
+        self.sheet.update_cell(number + 1, place + 2, votes_number)
         #vote(user_id, place, number)
 
     def unvote(self, place, number):
@@ -37,5 +36,5 @@ class Sheet:
         #print(len(data))
 
     def get_participants(self):
-        return self.sheet.col_values(2)[1:]
+        return self.sheet.col_values(1)[1:]
 

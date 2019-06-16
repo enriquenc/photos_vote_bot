@@ -73,11 +73,15 @@ def callback_inline(call):
 @bot.message_handler(commands=['result'])
 def result(message):
     sheet = Sheet("photos_vote_bot")
+    global participants
+
+    if participants is None:
+        participants = sheet.get_participants()
 
     admins = get_admins()
 
     if message.from_user.username in admins:
-        if database_interface.count_votes(sheet) is True:
+        if database_interface.count_votes(sheet, participants) is True:
             bot.send_message(message.chat.id, "Таблиця результатів оновлена.")
         else:
             bot.send_message(message.chat.id, "Щось пішло не так, спробуй ще раз або напиши розробнику.")
@@ -86,7 +90,7 @@ def result(message):
 
 
 @bot.message_handler(commands=['begin'])
-def reboot(message):
+def begin(message):
     admins = get_admins()
 
     if message.from_user.username in admins:
