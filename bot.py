@@ -22,7 +22,7 @@ def send_start(message):
         if database_interface.new_user(user_id) is False:
             bot.send_message(message.chat.id, "Сталась помилка, спробуй ще раз - /start")
             return
-        bot.send_message(message.chat.id, "Привіт, голосуй")
+        bot.send_message(message.chat.id, "Привіт, дякуємо за участь у фотовиставці, час вибрати твої улюблені знімки!")
         bot.send_message(message.chat.id, "Проголосуйте за 1 місце:", reply_markup=create_vote_markup(user_id, '1'))
         bot.send_message(message.chat.id, "Проголосуйте за 2 місце:", reply_markup=create_vote_markup(user_id, '2'))
         bot.send_message(message.chat.id, "Проголосуйте за 3 місце:", reply_markup=create_vote_markup(user_id, '3'))
@@ -30,16 +30,21 @@ def send_start(message):
         bot.send_message(message.chat.id, "Вибери свого фаворита вище")
 
 
-def create_vote_markup(user_id, place):
+def make_button(user_id, place, i):
     global participants
 
-    markup = types.InlineKeyboardMarkup(row_width=1)
-    for i in range(len(participants)):
-        markup.add(types.InlineKeyboardButton(text=participants[i],
+    return types.InlineKeyboardButton(text=participants[i],
                                                 callback_data=  str(user_id) + ';'
                                                                 + place + ';'
                                                                 + str(i + 1) + ';'
-                                                                + participants[i]))
+                                                                + participants[i])
+
+def create_vote_markup(user_id, place):
+    global participants
+
+    markup = types.InlineKeyboardMarkup(row_width=3)
+    for i in range(0, len(participants), 3):
+        markup.add(make_button(user_id, place, i), make_button(user_id, place, i + 1), make_button(user_id, place, i + 2))
     return markup
 
 
@@ -72,15 +77,15 @@ def callback_inline(call):
 
 @bot.message_handler(commands=['result'])
 def result(message):
-    sheet = Sheet("photos_vote_bot")
-    global participants
-
-    if participants is None:
-        participants = sheet.get_participants()
-
     admins = get_admins()
 
     if message.from_user.username in admins:
+        sheet = Sheet("photos_vote_bot")
+        global participants
+
+        if participants is None:
+            participants = sheet.get_participants()
+
         if database_interface.count_votes(sheet, participants) is True:
             bot.send_message(message.chat.id, "Таблиця результатів оновлена.")
         else:
@@ -103,6 +108,15 @@ def begin(message):
 
 def get_admins():
     return open('admin').read().splitlines()
+
+@bot.message_handler(commands=['null'])
+def null(message):
+    admins = get_admins()
+
+    if message.from_user.username in admins:
+        sheet = Sheet("photos_vote_bot")
+        sheet.null()
+        bot.send_message(message.chat.id, "Таблицю обнулено.")
 
 
 if __name__ == "__main__":

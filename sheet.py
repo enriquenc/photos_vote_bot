@@ -2,6 +2,7 @@ import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 from database_interface import *
 from time import gmtime, strftime
+import time
 
 
 class Sheet:
@@ -27,7 +28,7 @@ class Sheet:
         self.sheet.update_cell(number + 1, place + 2, votes_number - 1)
 
     def null(self):
-        data = self.sheet.get_all_values()
+        data = self.sheet.col_values(1)
         for row in range(2, len(data)):
             self.sheet.update_cell(row, 3, 0)
             self.sheet.update_cell(row, 4, 0)

@@ -1,6 +1,7 @@
 import pymysql
 from time import gmtime, strftime
 import pprint
+import time
 
 f = open('database_authorization', 'r')
 database_info = f.read().splitlines()
@@ -66,7 +67,7 @@ def count_votes(sheet, participants):
     cursor = conn.cursor()
 
     try:
-        sheet.null()
+
         result = []
         for i in range(len(participants)):
             result.append(
@@ -84,11 +85,11 @@ def count_votes(sheet, participants):
             result[second_place - 1]['second_place'] = result[second_place - 1]['second_place'] + 1
             result[third_place - 1]['third_place'] = result[third_place - 1]['third_place'] + 1
 
-        sheet.null()
         for i in range(len(result)):
             sheet.vote(i + 1, 1, result[i]['first_place'])
             sheet.vote(i + 1, 2, result[i]['second_place'])
             sheet.vote(i + 1, 3, result[i]['third_place'])
+            time.sleep(1)
 
     except Exception as msg:
         f = open('errors', 'a+')
